@@ -78,12 +78,21 @@ npm run worker
 
 ---
 
-## ⏱️ Harmonogramowanie w tle (Linux Cron)
+## ⏱️ Automatyczne Skanowanie w Tle (Auto-Sync)
 
-Aby aplikacja cyklicznie pobierała nowe terminarze (np. co 30 minut):
-```cron
-*/30 * * * * cd /sciezka/do/sesjeTurek && /usr/bin/npm run worker >> /var/log/sesje-turek.log 2>&1
-```
+Aplikacja posiada **wbudowany automatyczny harmonogram (Auto-Sync)** i nie wymaga konfiguracji zewnętrznego Crona:
+* **Domyślne działanie:** Po uruchomieniu serwera (`npm start` lub `npm run serve`), system samoczynnie przeprowadza pierwsze sprawdzenie biuletynów BIP po 5 sekundach od startu, a następnie powtarza je cyklicznie co **30 minut**.
+* **Konfiguracja w pliku `.env`:**
+  ```env
+  AUTO_SYNC_ENABLED=true        # włączenie/wyłączenie timera
+  SYNC_INTERVAL_MINUTES=30      # częstotliwość skanowania w minutach
+  ```
+* **Opcjonalnie (samodzielny worker pod Linux Cron):**
+  Jeśli wolisz wyłączyć wbudowany timer w serwerze i zarządzać zadaniami przez systemowy Cron na VPS:
+  ```cron
+  # Sprawdzanie co 30 minut
+  */30 * * * * cd /sciezka/do/sesjeTurek && /usr/bin/npm run worker >> /var/log/sesje-turek.log 2>&1
+  ```
 
 ---
 

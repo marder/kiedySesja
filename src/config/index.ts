@@ -20,6 +20,10 @@ export const config = {
     from: process.env.SMTP_FROM || '"Kiedy Sesja Bot" <noreply@example.com>',
     to: process.env.SMTP_TO || 'powiadomienia@example.com',
   },
+  sync: {
+    autoSyncEnabled: process.env.AUTO_SYNC_ENABLED !== 'false',
+    intervalMinutes: Number(process.env.SYNC_INTERVAL_MINUTES) || 30,
+  },
   http: {
     timeoutMs: Number(process.env.HTTP_TIMEOUT_MS) || 15000,
     userAgent:

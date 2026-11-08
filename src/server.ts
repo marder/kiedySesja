@@ -7,6 +7,7 @@ import { runSync } from './index.js';
 import { Meeting } from './types/index.js';
 import { getAllChannels } from './services/ntfyTopics.js';
 import { getPolishTodayStr } from './utils/dateParser.js';
+import { config } from './config/index.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -303,11 +304,49 @@ const server = http.createServer(async (req, res) => {
 });
 
 
+// --- Funkcja automatycznej synchronizacji w tle ---
+async function triggerAutoSync(reason: string) {
+  if (isSyncRunning) {
+    console.log(`[AutoSync] Pominięto (${reason}) - inna synchronizacja jest w toku.`);
+    return;
+  }
+  isSyncRunning = true;
+  console.log(`[AutoSync] Uruchamianie cyklu synchronizacji (${reason})...`);
+  try {
+    const result = await runSync(db);
+    console.log(
+      `[AutoSync] Zakończono sukcesem: sprawdzone ${result.totalProcessed}, nowe: ${result.totalNew}, zaktualizowane: ${result.totalUpdated}`
+    );
+  } catch (err) {
+    console.error('[AutoSync] Błąd podczas synchronizacji:', err);
+  } finally {
+    isSyncRunning = false;
+  }
+}
+
 server.listen(PORT, HOST, () => {
   console.log('='.repeat(60));
   console.log(`🌐 Serwis WWW KiedySesja działa pod adresem: http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
   console.log(`📊 API dostępne pod: http://localhost:${PORT}/api/meetings`);
-  console.log('='.repeat(60));
+
+  if (config.sync.autoSyncEnabled) {
+    const intervalMinutes = Math.max(1, config.sync.intervalMinutes);
+    console.log(`⏱️ Auto-Sync WŁĄCZONY: sprawdzanie co ${intervalMinutes} minut.`);
+    console.log('='.repeat(60));
+
+    // 1. Pierwsza synchronizacja wkrótce po starcie serwera (po 5 sekundach)
+    setTimeout(() => {
+      triggerAutoSync('start aplikacji');
+    }, 5000);
+
+    // 2. Cykliczny interwał
+    setInterval(() => {
+      triggerAutoSync(`cykl co ${intervalMinutes}m`);
+    }, intervalMinutes * 60 * 1000);
+  } else {
+    console.log('⏱️ Auto-Sync WYŁĄCZONY w konfiguracji.');
+    console.log('='.repeat(60));
+  }
 });
 
 export { server };
