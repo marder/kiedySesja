@@ -5,11 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>SesjeTurek – Terminarz Sesji i Komisji Miasta i Powiatu Turek</title>
   <meta name="description" content="Nowoczesny terminarz posiedzeń Rady Miejskiej Turku i Rady Powiatu Tureckiego. Sprawdzaj terminy sesji i komisji, dodawaj do kalendarza oraz otrzymuj powiadomienia PUSH.">
-  <meta name="theme-color" content="#0b0f17">
+  <meta name="theme-color" content="#0a0d14">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
@@ -18,9 +22,7 @@
     <div class="container header-inner">
       <div class="brand">
         <div class="brand-logo" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v4M12 14v4M16 14v4"/>
-          </svg>
+          <i data-lucide="landmark" class="icon-brand"></i>
         </div>
         <div class="brand-text">
           <div class="brand-title-row">
@@ -34,25 +36,25 @@
       <div class="header-actions">
         <!-- Przełącznik motywu -->
         <button id="btnThemeToggle" class="btn-action-icon" title="Zmień motyw (ciemny / jasny)" aria-label="Zmień motyw">
-          <span id="themeIcon">🌙</span>
+          <span id="themeIconSlot"><i data-lucide="moon" class="icon-header"></i></span>
           <span class="btn-label-desktop" id="themeLabel">Ciemny</span>
         </button>
 
         <!-- Powiadomienia -->
-        <button id="btnNtfyInfo" class="btn-action-icon" title="Konfiguracja powiadomień ntfy.sh" aria-label="Powiadomienia">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+        <button id="btnNtfyInfo" class="btn-action-icon" title="Powiadomienia ntfy.sh (kiedy-sesje-turek)" aria-label="Powiadomienia">
+          <i data-lucide="bell" class="icon-header"></i>
           <span class="btn-label-desktop">Powiadomienia</span>
         </button>
 
         <!-- Eksport .ics -->
         <a href="/api/export/ics" class="btn-action-icon" title="Pobierz plik kalendarza iCalendar (.ics)" aria-label="Eksportuj kalendarz">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <i data-lucide="calendar-arrow-down" class="icon-header"></i>
           <span class="btn-label-desktop">Eksport .ics</span>
         </a>
 
         <!-- Przycisk synchronizacji -->
         <button id="btnSync" class="btn-sync" title="Wymuś synchronizację z biuletynami BIP" aria-label="Synchronizuj">
-          <svg id="syncIcon" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-1.19"/></svg>
+          <span id="syncIconSlot"><i data-lucide="refresh-cw" class="icon-header icon-sync"></i></span>
           <span class="btn-sync-text">Synchronizuj</span>
         </button>
       </div>
@@ -66,7 +68,7 @@
         <div class="stats-grid">
           <button class="stat-card active" data-filter="all" type="button">
             <div class="stat-icon icon-blue">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <i data-lucide="layout-grid"></i>
             </div>
             <div class="stat-data">
               <div class="stat-value" id="statTotal">-</div>
@@ -76,7 +78,7 @@
 
           <button class="stat-card" data-filter="upcoming" type="button">
             <div class="stat-icon icon-green">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <i data-lucide="clock"></i>
             </div>
             <div class="stat-data">
               <div class="stat-value" id="statUpcoming">-</div>
@@ -86,7 +88,7 @@
 
           <button class="stat-card" data-type="Sesja" type="button">
             <div class="stat-icon icon-purple">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              <i data-lucide="building-2"></i>
             </div>
             <div class="stat-data">
               <div class="stat-value" id="statSessions">-</div>
@@ -96,7 +98,7 @@
 
           <button class="stat-card" data-type="Komisja" type="button">
             <div class="stat-icon icon-amber">
-              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <i data-lucide="users"></i>
             </div>
             <div class="stat-data">
               <div class="stat-value" id="statCommissions">-</div>
@@ -114,13 +116,13 @@
       <!-- Górny wiersz: Wyszukiwarka + Wybór Samorządu -->
       <div class="filter-row top-row">
         <div class="search-box">
-          <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <i data-lucide="search" class="search-icon"></i>
           <input type="text" id="searchInput" placeholder="Szukaj sesji, komisji, tematu..." autocomplete="off">
           <button id="btnClearSearch" class="btn-clear hidden" aria-label="Wyczyść szukanie">&times;</button>
         </div>
 
         <div class="select-box">
-          <svg class="select-chevron" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+          <i data-lucide="chevron-down" class="select-chevron"></i>
           <select id="municipalitySelect">
             <option value="all">Wszystkie samorządy (Miasto & Powiat)</option>
           </select>
@@ -148,10 +150,10 @@
         <!-- Przełącznik widoku: Karty vs Tabela -->
         <div class="view-switcher" role="group" aria-label="Format widoku">
           <button id="btnViewCards" class="view-btn active" title="Widok kafelkowy" aria-label="Widok kart">
-            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <i data-lucide="layout-grid" class="icon-view"></i>
           </button>
           <button id="btnViewTable" class="view-btn" title="Widok listy tabelarycznej" aria-label="Widok tabeli">
-            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            <i data-lucide="list" class="icon-view"></i>
           </button>
         </div>
       </div>
@@ -194,7 +196,7 @@
     <!-- Stan pusty (Brak wyników) -->
     <div id="emptyState" class="empty-state hidden">
       <div class="empty-icon-wrap">
-        <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+        <i data-lucide="search-x" style="width: 36px; height: 36px;"></i>
       </div>
       <h3>Brak pasujących posiedzeń</h3>
       <p>Nie znaleziono posiedzeń spełniających wybrane kryteria filtrów lub frazę wyszukiwania.</p>
@@ -207,42 +209,38 @@
     <div class="modal-card modal-large">
       <div class="modal-header">
         <div>
-          <h3 id="modalTitle">🔔 Powiadomienia PUSH w telefonie</h3>
+          <h3 id="modalTitle">🔔 Powiadomienia PUSH (ntfy.sh)</h3>
           <p class="modal-desc">Bądź na bieżąco z posiedzeniami bez rejestracji i bez spamu</p>
         </div>
         <button id="btnCloseModal" class="btn-close" aria-label="Zamknij">&times;</button>
       </div>
       <div class="modal-body">
-        <!-- Opcja 1: Kanał zbiorczy -->
+        <!-- Opcja: Kanał oficjalny -->
         <div class="channel-card channel-featured">
           <div class="channel-info">
-            <span class="channel-badge">Główny kanał zbiorczy</span>
-            <h4>Miasto i Powiat Turek (Wszystko)</h4>
+            <span class="channel-badge">Główny kanał oficjalny</span>
+            <h4>KiedySesja Turek (Miasto & Powiat)</h4>
             <p>Otrzymuj alerty o każdej nowej sesji oraz posiedzeniu komisji w Turku i powiecie.</p>
-            <div class="topic-tag">Kanał: <code>sesjeturek_test</code></div>
+            <div class="topic-tag">Kanał: <code>kiedy-sesje-turek</code></div>
           </div>
-          <a href="https://ntfy.sh/sesjeturek_test" target="_blank" rel="noopener" class="btn btn-primary btn-channel-cta">
-            Subskrybuj kanał zbiorczy &rarr;
+          <a href="https://ntfy.sh/kiedy-sesje-turek" target="_blank" rel="noopener" class="btn btn-primary btn-channel-cta">
+            <i data-lucide="bell-ring" style="width: 18px; height: 18px; margin-right: 8px;"></i>
+            Subskrybuj kanał kiedy-sesje-turek &rarr;
           </a>
-        </div>
-
-        <h4 class="channels-section-title">Dedykowane kanały tematyczne:</h4>
-        <div class="channels-grid" id="channelsGrid">
-          <!-- Wypełniane dynamicznie przez app.js -->
         </div>
 
         <div class="notification-howto">
           <div class="howto-item">
             <div class="howto-step">1</div>
-            <div><strong>Aplikacja mobilna:</strong> Pobierz darmową aplikację <em>ntfy</em> ze sklepu Google Play lub App Store (bez zakładania konta).</div>
+            <div><strong>Aplikacja w telefonie:</strong> Zainstaluj bezpłatną aplikację <em>ntfy</em> ze sklepu Google Play lub App Store (działa bez rejestracji i bez reklam).</div>
           </div>
           <div class="howto-item">
             <div class="howto-step">2</div>
-            <div><strong>Wpisz nazwę tematu:</strong> Kliknij powyższy link lub dodaj temat ręcznie w aplikacji (np. <code>sesjeturek_miasto</code> lub <code>sesjeturek_powiat</code>).</div>
+            <div><strong>Wpisz nazwę tematu:</strong> W aplikacji kliknij <em>+</em> i wpisz temat: <code>kiedy-sesje-turek</code></div>
           </div>
           <div class="howto-item">
             <div class="howto-step">3</div>
-            <div><strong>Inteligentne powiadomienia:</strong> System wysyła alerty wyłącznie o bieżących i nadchodzących terminach.</div>
+            <div><strong>Gotowe:</strong> Otrzymasz natychmiastowe powiadomienie z datą, godziną i bezpośrednim linkiem za każdym razem, gdy pojawi się nowe posiedzenie.</div>
           </div>
         </div>
       </div>
@@ -261,7 +259,7 @@
       </div>
       <div class="footer-right">
         <span class="badge-status">
-          <span class="status-dot"></span> Worker aktywny
+          <span class="status-dot"></span> Kanał ntfy: kiedy-sesje-turek
         </span>
       </div>
     </div>

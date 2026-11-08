@@ -76,6 +76,11 @@ export class NotificationService {
     for (const targetUrl of targetUrls) {
       try {
         const topicName = targetUrl.replace(`${BASE_NTFY_SERVER}/`, '');
+        const isSesja = payload.meeting.type.toLowerCase().includes('sesj');
+        const defaultTags = isNew
+          ? [isSesja ? 'classical_building' : 'clipboard', 'calendar', 'sparkles']
+          : ['warning', 'bell'];
+
         const response = await fetch(BASE_NTFY_SERVER, {
           method: 'POST',
           signal: AbortSignal.timeout(3000), // 3 sekundy timeoutu
@@ -87,7 +92,7 @@ export class NotificationService {
             title,
             message,
             priority: isNew ? 3 : 4,
-            tags: isNew ? ['calendar', 'sparkles'] : ['warning', 'bell'],
+            tags: defaultTags,
             click: payload.meeting.url,
           }),
         });

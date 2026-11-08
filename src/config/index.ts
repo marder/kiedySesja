@@ -6,7 +6,7 @@ export const config = {
   },
   ntfy: {
     enabled: process.env.NTFY_ENABLED !== 'false',
-    topicUrl: process.env.NTFY_URL || 'https://ntfy.sh/radypowiatuturek_test',
+    topicUrl: process.env.NTFY_URL || 'https://ntfy.sh/kiedy-sesje-turek',
   },
   smtp: {
     enabled: process.env.SMTP_ENABLED === 'true',

@@ -42,18 +42,23 @@ const elements = {
   btnResetFilters: document.getElementById('btnResetFilters'),
 
   btnSync: document.getElementById('btnSync'),
-  syncIcon: document.getElementById('syncIcon'),
+  syncIconSlot: document.getElementById('syncIconSlot'),
   toast: document.getElementById('toast'),
 
   btnNtfyInfo: document.getElementById('btnNtfyInfo'),
   ntfyModal: document.getElementById('ntfyModal'),
   btnCloseModal: document.getElementById('btnCloseModal'),
-  channelsGrid: document.getElementById('channelsGrid'),
 
   btnThemeToggle: document.getElementById('btnThemeToggle'),
-  themeIcon: document.getElementById('themeIcon'),
+  themeIconSlot: document.getElementById('themeIconSlot'),
   themeLabel: document.getElementById('themeLabel'),
 };
+
+function refreshIcons() {
+  if (window.lucide && typeof window.lucide.createIcons === 'function') {
+    window.lucide.createIcons();
+  }
+}
 
 // Inicjalizacja
 document.addEventListener('DOMContentLoaded', () => {
@@ -75,15 +80,16 @@ function applyTheme(theme) {
   const metaTheme = document.querySelector('meta[name="theme-color"]');
   if (theme === 'light') {
     document.body.classList.add('light-theme');
-    elements.themeIcon.textContent = '☀️';
+    elements.themeIconSlot.innerHTML = '<i data-lucide="sun" class="icon-header"></i>';
     if (elements.themeLabel) elements.themeLabel.textContent = 'Jasny';
     if (metaTheme) metaTheme.setAttribute('content', '#f8fafc');
   } else {
     document.body.classList.remove('light-theme');
-    elements.themeIcon.textContent = '🌙';
+    elements.themeIconSlot.innerHTML = '<i data-lucide="moon" class="icon-header"></i>';
     if (elements.themeLabel) elements.themeLabel.textContent = 'Ciemny';
     if (metaTheme) metaTheme.setAttribute('content', '#0a0d14');
   }
+  refreshIcons();
 }
 
 function initEventListeners() {
@@ -231,32 +237,11 @@ async function loadData() {
 
     renderStats();
     populateMunicipalitySelect();
-    renderChannelsModal();
     applyFilters();
   } catch (err) {
     console.error('Błąd podczas ładowania danych:', err);
     showToast('❌ Błąd połączenia z serwerem');
   }
-}
-
-function renderChannelsModal() {
-  if (!state.channels || !elements.channelsGrid) return;
-  elements.channelsGrid.innerHTML = '';
-
-  state.channels.municipalities.forEach(ch => {
-    const item = document.createElement('div');
-    item.className = 'muni-channel-item';
-    item.innerHTML = `
-      <div>
-        <div class="muni-name">${escapeHtml(ch.municipality)}</div>
-        <span class="muni-topic">Kanał: <code>${escapeHtml(ch.topic)}</code></span>
-      </div>
-      <a href="${escapeHtml(ch.url)}" target="_blank" rel="noopener" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" title="Otwórz kanał ${escapeHtml(ch.municipality)} w ntfy">
-        Subskrybuj
-      </a>
-    `;
-    elements.channelsGrid.appendChild(item);
-  });
 }
 
 function renderStats() {
@@ -322,13 +307,18 @@ function renderMeetings() {
   elements.cardsContainer.classList.toggle('hidden', isEmpty || state.filters.view !== 'cards');
   elements.tableContainer.classList.toggle('hidden', isEmpty || state.filters.view !== 'table');
 
-  if (isEmpty) return;
+  if (isEmpty) {
+    refreshIcons();
+    return;
+  }
 
   if (state.filters.view === 'cards') {
     renderCardsView();
   } else {
     renderTableView();
   }
+
+  refreshIcons();
 }
 
 function renderCardsView() {
@@ -349,7 +339,10 @@ function renderCardsView() {
     card.innerHTML = `
       <div>
         <div class="card-header-row">
-          <span class="municipality-tag">${escapeHtml(m.municipality)}</span>
+          <span class="municipality-tag">
+            <i data-lucide="${isSesja ? 'landmark' : 'users'}" class="icon-inline"></i>
+            ${escapeHtml(m.municipality)}
+          </span>
           <span class="type-tag ${typeClass}">${escapeHtml(m.type)}</span>
         </div>
         <h3 class="card-title">${escapeHtml(m.title)}</h3>
@@ -365,7 +358,7 @@ function renderCardsView() {
             <div class="date-info-texts">
               <span class="date-full-text">${dateBadge.weekday}, ${dateBadge.year}</span>
               <span class="date-time-text">
-                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <i data-lucide="clock" class="icon-inline"></i>
                 ${dateBadge.time}
               </span>
             </div>
@@ -374,12 +367,12 @@ function renderCardsView() {
         </div>
 
         <div class="card-actions">
-          <a href="${escapeHtml(m.url)}" target="_blank" rel="noopener" class="card-btn card-btn-link" title="Przejdź do źródła">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          <a href="${escapeHtml(m.url)}" target="_blank" rel="noopener" class="card-btn card-btn-link" title="Przejdź do źródła BIP">
+            <i data-lucide="external-link" class="icon-btn"></i>
             BIP / Źródło
           </a>
           <a href="${googleCalUrl}" target="_blank" rel="noopener" class="card-btn card-btn-cal" title="Dodaj do Kalendarza Google">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <i data-lucide="calendar-plus" class="icon-btn"></i>
             + Kalendarz
           </a>
         </div>
@@ -411,7 +404,7 @@ function renderTableView() {
       <td><span style="font-size: 0.8rem; font-weight: 600; color: var(--success);">${escapeHtml(m.status)}</span></td>
       <td>
         <a href="${escapeHtml(m.url)}" target="_blank" rel="noopener" class="card-btn card-btn-link" style="padding: 4px 10px; font-size: 0.75rem; display: inline-flex;">
-          BIP &rarr;
+          <i data-lucide="external-link" class="icon-btn"></i> BIP
         </a>
       </td>
     `;
@@ -423,7 +416,7 @@ async function handleSync() {
   if (state.isSyncing) return;
   state.isSyncing = true;
   elements.btnSync.disabled = true;
-  elements.syncIcon.classList.add('spin');
+  elements.syncIconSlot.classList.add('spin');
   showToast('🔄 Synchronizacja z biuletynami BIP w toku...');
 
   try {
@@ -441,7 +434,7 @@ async function handleSync() {
   } finally {
     state.isSyncing = false;
     elements.btnSync.disabled = false;
-    elements.syncIcon.classList.remove('spin');
+    elements.syncIconSlot.classList.remove('spin');
   }
 }
 
