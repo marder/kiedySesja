@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sesje i Komisje Miasta i Powiatu Turek | Terminarz Posiedzeń</title>
+  <meta name="description" content="Agregator terminarzy sesji Rady Miejskiej Turku i Rady Powiatu Tureckiego oraz posiedzeń komisji.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <!-- Górny pasek nawigacyjny -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="brand">
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v4M12 14v4M16 14v4"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">SesjeTurek <span class="badge-region">Miasto & Powiat</span></span>
+          <span class="brand-subtitle">Terminarz sesji i posiedzeń komisji Miasta Turek oraz Powiatu Tureckiego</span>
+        </div>
+      </div>
+
+
+      <div class="header-actions">
+        <!-- Przełącznik motywu (Domyślnie ciemny) -->
+        <button id="btnThemeToggle" class="btn btn-secondary btn-icon" title="Zmień motyw">
+          <span id="themeIcon">🌙</span>
+          <span id="themeLabel">Ciemny</span>
+        </button>
+
+        <button id="btnNtfyInfo" class="btn btn-secondary btn-icon" title="Konfiguracja powiadomień">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span>Powiadomienia</span>
+        </button>
+
+        <a href="/api/export/ics" class="btn btn-secondary btn-icon" title="Pobierz plik kalendarza iCalendar">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          <span>Eksportuj .ics</span>
+        </a>
+
+        <button id="btnSync" class="btn btn-primary btn-icon">
+          <svg id="syncIcon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-1.19"/></svg>
+          <span>Synchronizuj z BIP</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Pasek statystyk (KPI) -->
+  <section class="stats-section">
+    <div class="container">
+      <div class="stats-grid">
+        <div class="stat-card active" data-filter="all">
+          <div class="stat-icon icon-blue">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div class="stat-data">
+            <div class="stat-value" id="statTotal">-</div>
+            <div class="stat-label">Wszystkie posiedzenia</div>
+          </div>
+        </div>
+
+        <div class="stat-card" data-filter="upcoming">
+          <div class="stat-icon icon-green">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div class="stat-data">
+            <div class="stat-value" id="statUpcoming">-</div>
+            <div class="stat-label">Nadchodzące</div>
+          </div>
+        </div>
+
+        <div class="stat-card" data-type="Sesja">
+          <div class="stat-icon icon-purple">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          </div>
+          <div class="stat-data">
+            <div class="stat-value" id="statSessions">-</div>
+            <div class="stat-label">Sesje Rady</div>
+          </div>
+        </div>
+
+        <div class="stat-card" data-type="Komisja">
+          <div class="stat-icon icon-amber">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <div class="stat-data">
+            <div class="stat-value" id="statCommissions">-</div>
+            <div class="stat-label">Posiedzenia Komisji</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pasek filtrów i wyszukiwarka -->
+  <main class="container main-content">
+    <div class="filter-panel">
+      <div class="filter-row top-row">
+        <!-- Wyszukiwarka -->
+        <div class="search-box">
+          <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="searchInput" placeholder="Szukaj po tytule, temacie, komisji lub gminie..." autocomplete="off">
+          <button id="btnClearSearch" class="btn-clear hidden">&times;</button>
+        </div>
+
+        <!-- Wybór Samorządu -->
+        <div class="select-box">
+          <select id="municipalitySelect">
+            <option value="all">Wszystkie samorządy powiatu tureckiego</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="filter-row bottom-row">
+        <!-- Czas: Domyślnie "Wszystkie" (żadna sesja nie jest ukrywana) -->
+        <div class="segmented-control" id="timeFilterControl">
+          <button class="seg-btn active" data-time="all">Wszystkie</button>
+          <button class="seg-btn" data-time="upcoming">Nadchodzące</button>
+          <button class="seg-btn" data-time="past">Archiwalne</button>
+        </div>
+
+        <!-- Typ: Wszystkie / Sesja / Komisja -->
+        <div class="segmented-control" id="typeFilterControl">
+          <button class="seg-btn active" data-type="all">Wszystkie typy</button>
+          <button class="seg-btn" data-type="Sesja">Tylko Sesje</button>
+          <button class="seg-btn" data-type="Komisja">Tylko Komisje</button>
+        </div>
+
+        <!-- Przełącznik widoku: Karty vs Tabela -->
+        <div class="view-switcher">
+          <button id="btnViewCards" class="view-btn active" title="Widok siatki kart">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          </button>
+          <button id="btnViewTable" class="view-btn" title="Widok tabeli">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pasek statusu wyników -->
+    <div class="results-header">
+      <div class="results-count" id="resultsCount">Wczytywanie posiedzeń...</div>
+      <div class="sort-box">
+        <label for="sortSelect">Sortowanie:</label>
+        <select id="sortSelect">
+          <!-- DOMYŚLNIE od najnowszych do najstarszych -->
+          <option value="date_desc" selected>Od najnowszych do najstarszych (domyślnie)</option>
+          <option value="date_asc">Od najstarszych / najbliższych</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Kontener wyników: Widok Kart -->
+    <div id="cardsContainer" class="cards-grid"></div>
+
+    <!-- Kontener wyników: Widok Tabeli -->
+    <div id="tableContainer" class="table-wrapper hidden">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Termin i godzina</th>
+            <th>Jednostka samorządu</th>
+            <th>Typ</th>
+            <th>Tytuł / Przedmiot posiedzenia</th>
+            <th>Status</th>
+            <th>Źródło</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Stan pusty (Brak wyników) -->
+    <div id="emptyState" class="empty-state hidden">
+      <div class="empty-icon">🔍</div>
+      <h3>Brak posiedzeń spełniających kryteria</h3>
+      <p>Spróbuj zmienić parametry wyszukiwania, wybrać inny samorząd lub przełączyć filtr na "Wszystkie".</p>
+      <button id="btnResetFilters" class="btn btn-secondary">Zresetuj filtry</button>
+    </div>
+  </main>
+
+  <!-- Modal: Konfiguracja Powiadomień (ntfy.sh) -->
+  <div id="ntfyModal" class="modal-overlay hidden">
+    <div class="modal-card modal-large">
+      <div class="modal-header">
+        <div>
+          <h3>🔔 Darmowe Powiadomienia PUSH (ntfy.sh)</h3>
+          <p class="modal-desc">Wybierz kanał zbiorczy dla całego powiatu lub tylko swoją gminę</p>
+        </div>
+        <button id="btnCloseModal" class="btn-close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- Opcja 1: Kanał zbiorczy -->
+        <div class="channel-card channel-featured">
+          <div class="channel-info">
+            <div class="channel-badge">Zbiorczy dla całego powiatu</div>
+            <h4>Wszystkie gminy i powiat turecki</h4>
+            <p>Otrzymuj alerty o każdej nowej sesji i posiedzeniu komisji w całym powiecie.</p>
+            <div class="topic-tag">Temat: <code>radypowiatuturek_test</code></div>
+          </div>
+          <a href="https://ntfy.sh/radypowiatuturek_test" target="_blank" rel="noopener" class="btn btn-primary">
+            Subskrybuj kanał zbiorczy &rarr;
+          </a>
+        </div>
+
+        <h4 class="channels-section-title">Lub wybierz dedykowany kanał dla swojej gminy:</h4>
+        <div class="channels-grid" id="channelsGrid">
+          <!-- Wypełniane dynamicznie przez app.js -->
+        </div>
+
+        <div class="notification-howto">
+          <div class="howto-item">
+            <span class="step-num">1</span>
+            <div><strong>Telefon:</strong> Zainstaluj darmową aplikację <em>ntfy</em> (Android / iOS) lub korzystaj w przeglądarce bez rejestracji.</div>
+          </div>
+          <div class="howto-item">
+            <span class="step-num">2</span>
+            <div><strong>Ochrona przed spamem:</strong> System wysyła alerty wyłącznie o bieżących i nadchodzących posiedzeniach.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast z powiadomieniem o synchronizacji -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- Stopka -->
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <div class="footer-left">
+        <p><strong>SesjeTurek</strong> &copy; 2026. Agregacja danych publicznych BIP Miasta Turek & Starostwa Powiatowego w Turku.</p>
+        <p class="sources-list">Źródła: Urząd Miejski w Turku (System Rada), Starostwo Powiatowe w Turku (BIP).</p>
+      </div>
+
+
+      <div class="footer-right">
+        <span class="badge-status">Status workera: Aktywny</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/app.js"></script>
+</body>
+</html>

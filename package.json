@@ -1,0 +1,43 @@
+{
+  "name": "kiedy-sesja",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Mikroserwis do agregacji terminarzy samorządowych, detekcji zmian i wysyłania powiadomień",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "serve": "tsx src/server.ts",
+    "worker": "tsx src/index.ts",
+    "test": "node --test dist/**/*.test.js",
+    "test:live": "node dist/tests/canary.live.js",
+    "lint": "tsc --noEmit"
+  },
+
+  "keywords": [
+    "bip",
+    "scraping",
+    "samorzad",
+    "sesje",
+    "powiadomienia",
+    "sqlite"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "better-sqlite3": "^11.8.1",
+    "cheerio": "^1.0.0",
+    "nodemailer": "^6.10.0"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/node": "^22.13.4",
+    "@types/nodemailer": "^6.4.17",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3"
+  },
+  "allowScripts": {
+    "better-sqlite3@11.10.0": true,
+    "esbuild@0.28.2": true
+  }
+}
