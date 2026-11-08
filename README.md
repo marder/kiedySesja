@@ -1,39 +1,34 @@
-# KiedySesja – Serwis WWW & Agregator Terminarzy Powiatu Tureckiego
+# KiedySesja – Serwis WWW & Agregator Terminarzy Miasta i Powiatu Tureckiego
 
-Kompletny serwis internetowy oraz mikroserwis backendowy w **Node.js + TypeScript**, agregujący terminarze sesji i komisji rad gmin, miasta oraz powiatu tureckiego. System automatycznie monitoruje biuletyny BIP, e-Sesję oraz systemy rad, wykrywa zmiany i publikuje dane przez responsywny portal WWW, API REST oraz powiadomienia push (ntfy.sh / SMTP).
+Nowoczesny serwis internetowy oraz mikroserwis backendowy w **Node.js + TypeScript**, agregujący terminarze sesji i komisji **Rady Miejskiej Turku** oraz **Rady Powiatu Tureckiego**. System automatycznie monitoruje oficjalne biuletyny BIP oraz systemy rad (m.in. System Rada), wykrywa nowe i zaktualizowane posiedzenia oraz udostępnia dane przez responsywny interfejs WWW (SPA), API REST, kalendarz iCalendar (.ics) oraz powiadomienia push (ntfy.sh / SMTP).
 
 ---
 
 ## 🌐 Funkcjonalności Serwisu WWW
 
 * **Nowoczesny Dashboard (SPA):**
-  * Liczniki posiedzeń (wszystkie, nadchodzące, sesje rady, posiedzenia komisji).
-  * Podział na 9 jednostek samorządowych Powiatu Tureckiego:
-    * **Rada Powiatu Tureckiego** (Starostwo Powiatowe w Turku)
-    * **Rada Miejska Turku** (Miasto Turek)
-    * **Gmina i Miasto Tuliszków**
-    * **Gmina Dobra**
-    * **Gmina Brudzew**
-    * **Gmina Malanów**
-    * **Gmina Władysławów**
-    * **Gmina Przykona**
-    * **Gmina Kawęczyn**
+  * Liczniki posiedzeń KPI (wszystkie, nadchodzące, sesje rady, posiedzenia komisji).
+  * Przełącznik motywów: domyślny **Dark Mode** oraz **Light Mode** z zapamiętywaniem wyboru w `localStorage`.
+  * Obsługa kluczowych jednostek samorządowych:
+    * **Rada Miejska Turku** (Urząd Miejski w Turku – System Rada)
+    * **Rada Powiatu Tureckiego** (Starostwo Powiatowe w Turku – Biuletyn Informacji Publicznej)
 * **Filtrowanie i Wyszukiwanie:**
   * Wyszukiwarka na żywo (tytuł, temat, numer sesji, komisja).
-  * Wybór konkretnego samorządu.
-  * Filtry czasu: *Nadchodzące* / *Archiwalne* / *Wszystkie*.
-  * Filtry typu: *Wszystkie* / *Tylko Sesje* / *Tylko Komisje*.
-  * Sortowanie chronologiczne od najbliższych terminów lub od najnowszych.
-* **Widoki:**
-  * **Siatka kart:** Czytelne karty z odliczaniem (*"Za X dni"*, *"Jutro"*, *"Zakończone"*), bezpośrednim linkiem do BIP i przyciskiem *"+ Dodaj do Kalendarza Google"*.
-  * **Tabela:** Kompaktowy widok tabelaryczny.
+  * Wybór samorządu (Wszystkie / Miasto Turek / Powiat Turecki).
+  * Filtry czasu: *Wszystkie* / *Nadchodzące* / *Archiwalne*.
+  * Filtry typu: *Wszystkie typy* / *Tylko Sesje* / *Tylko Komisje*.
+  * Sortowanie chronologiczne: od najnowszych do najstarszych (domyślnie) lub rosnąco od najbliższych/najstarszych.
+* **Widoki i Akcje:**
+  * **Siatka kart:** Czytelne karty posiedzeń z dynamicznym odliczaniem (*"Za X dni"*, *"Jutro"*, *"Dzisiaj"*, *"Zakończone"*), bezpośrednim linkiem do BIP/źródła oraz przyciskiem dodania do Kalendarza Google.
+  * **Widok tabeli:** Zwięzłe, tabelaryczne zestawienie dla szybkiego przeglądu.
 * **Integracje & Eksport:**
-  * 🔄 **Przycisk "Synchronizuj z BIP":** Uruchomienie cyklu zbierania danych na żądanie z poziomu przeglądarki.
-  * 📅 **Eksport iCalendar (.ics):** Pobieranie terminarza do Outlooka, Apple Calendar lub Google Calendar.
-  * 🔔 **Powiadomienia Push w telefonie (ntfy.sh):** 
-    * Kanał zbiorczy: `https://ntfy.sh/radypowiatuturek_test`
-    * Dedykowane kanały per gmina: `radypowiatuturek_powiat`, `radypowiatuturek_turek`, `radypowiatuturek_tuliszkow`, `radypowiatuturek_dobra`, `radypowiatuturek_brudzew`, `radypowiatuturek_malanow`, `radypowiatuturek_wladyslawow`, `radypowiatuturek_przykona`, `radypowiatuturek_kaweczyn`.
-    * **Ochrona przed spamem i limitem 429:** PUSH wysyłany jest wyłącznie dla posiedzeń bieżących, nadchodzących lub świeżo opublikowanych (ostatnie 14 dni). Dane archiwalne zapisywane są po cichu do bazy.
+  * 🔄 **Synchronizacja na żądanie:** Przycisk *"Synchronizuj z BIP"* wywołujący natychmiastowe scrapowanie w tle.
+  * 📅 **Eksport iCalendar (.ics):** Bezpośredni eksport całego terminarza do Outlooka, Apple Calendar lub Google Calendar.
+  * 🔔 **Powiadomienia Push (ntfy.sh):**
+    * Kanał wspólny: `https://ntfy.sh/sesjeturek_test`
+    * Kanał Miasto Turek: `https://ntfy.sh/sesjeturek_miasto`
+    * Kanał Powiat Turecki: `https://ntfy.sh/sesjeturek_powiat`
+    * **Inteligentna wysyłka:** PUSH jest wysyłany wyłącznie dla posiedzeń bieżących, nadchodzących lub świeżo opublikowanych (ostatnie 14 dni), zapobiegając spamowaniu starszymi archiwaliami.
 
 ---
 
@@ -41,38 +36,60 @@ Kompletny serwis internetowy oraz mikroserwis backendowy w **Node.js + TypeScrip
 
 | Metoda | Endpoint | Opis |
 |---|---|---|
-| `GET` | `/api/meetings` | Lista posiedzeń z filtrowaniem (`?municipality=...&type=...&timeFilter=all&sort=date_desc&q=...`) |
+| `GET` | `/api/meetings` | Lista posiedzeń z parametrami filtrującymi (`?municipality=...&type=...&timeFilter=all&sort=date_desc&q=...`) |
 | `GET` | `/api/stats` | Statystyki globalne i wg samorządów |
-| `GET` | `/api/municipalities` | Lista samorządów z liczbą posiedzeń |
-| `GET` | `/api/channels` | Lista dostępnych kanałów ntfy (zbiorczy oraz dedykowane per gmina) |
-| `POST` | `/api/sync` | Wymuszenie ponownej synchronizacji scraperów z BIP |
-| `GET` | `/api/export/ics` | Plik iCalendar (`.ics`) do importu w kalendarzach |
-| `GET` | `/api/export/json` | Pobranie wszystkich danych w formacie JSON |
+| `GET` | `/api/municipalities` | Lista samorządów z liczbą przypisanych posiedzeń |
+| `GET` | `/api/channels` | Lista skonfigurowanych kanałów ntfy.sh (zbiorczy oraz dedykowane) |
+| `POST` | `/api/sync` | Wymuszenie uruchomienia scraperów |
+| `GET` | `/api/export/ics` | Eksport terminarza w standardzie iCalendar (`.ics`) |
+| `GET` | `/api/export/json` | Pobranie kompletnej bazy w formacie JSON |
 
 ---
 
-## 🚀 Uruchomienie
+## 🚀 Uruchomienie lokalne
 
-### 1. Uruchomienie Serwisu WWW (Frontend + Backend)
+### 1. Instalacja zależności
+```bash
+npm install
+```
+
+### 2. Konfiguracja zmiennych środowiskowych
+Skopiuj plik `.env.example` do `.env` i uzupełnij opcjonalne dane (np. konfigurację powiadomień e-mail SMTP lub alternatywny port):
+```bash
+cp .env.example .env
+```
+
+### 3. Uruchomienie aplikacji w trybie deweloperskim
 ```bash
 npm run serve
 ```
-lub wersja produkcyjna po kompilacji:
+Aplikacja uruchomi się pod adresem: **http://localhost:3000**
+
+### 4. Kompilacja i start produkcyjny
 ```bash
 npm run build
 npm start
 ```
-Serwis dostępny jest pod adresem: **http://localhost:3000**
 
-### 2. Uruchomienie samego workera (np. w cronie)
+### 5. Samodzielny worker synchronizujący
 ```bash
 npm run worker
 ```
 
 ---
 
-## ⏱️ Harmonogramowanie na VPS (Cron)
+## ⏱️ Harmonogramowanie w tle (Linux Cron)
+
+Aby aplikacja cyklicznie pobierała nowe terminarze (np. co 30 minut):
 ```cron
-# Sprawdzanie co 30 minut
-*/30 * * * * cd /sciezka/do/kiedySesja && /usr/bin/npm run worker >> /var/log/kiedy-sesja.log 2>&1
+*/30 * * * * cd /sciezka/do/sesjeTurek && /usr/bin/npm run worker >> /var/log/sesje-turek.log 2>&1
+```
+
+---
+
+## 🧪 Testy
+
+```bash
+npm test         # Testy jednostkowe parserów i logiki bazy
+npm run test:live # Testy canary sprawdzające scrapery na żywych źródłach
 ```
