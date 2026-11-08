@@ -8,9 +8,9 @@ const state = {
   filters: {
     municipality: 'all',
     type: 'all',
-    timeFilter: 'all', // DOMYŚLNIE 'all' (żadne rekordy nie są ukryte)
+    timeFilter: 'all', // DOMYŚLNIE 'all'
     q: '',
-    sort: 'date_desc', // DOMYŚLNIE od najnowszych do najstarszych
+    sort: 'date_desc', // DOMYŚLNIE od najnowszych
     view: 'cards', // 'cards' | 'table'
   },
   theme: localStorage.getItem('theme') || 'dark', // DOMYŚLNIE Dark Mode
@@ -72,19 +72,22 @@ function initTheme() {
 }
 
 function applyTheme(theme) {
+  const metaTheme = document.querySelector('meta[name="theme-color"]');
   if (theme === 'light') {
     document.body.classList.add('light-theme');
     elements.themeIcon.textContent = '☀️';
-    elements.themeLabel.textContent = 'Jasny';
+    if (elements.themeLabel) elements.themeLabel.textContent = 'Jasny';
+    if (metaTheme) metaTheme.setAttribute('content', '#f8fafc');
   } else {
     document.body.classList.remove('light-theme');
     elements.themeIcon.textContent = '🌙';
-    elements.themeLabel.textContent = 'Ciemny';
+    if (elements.themeLabel) elements.themeLabel.textContent = 'Ciemny';
+    if (metaTheme) metaTheme.setAttribute('content', '#0a0d14');
   }
 }
 
 function initEventListeners() {
-  // Wyszukiwanie
+  // Wyszukiwanie na żywo
   elements.searchInput.addEventListener('input', (e) => {
     state.filters.q = e.target.value.trim().toLowerCase();
     elements.btnClearSearch.classList.toggle('hidden', !state.filters.q);
@@ -131,7 +134,7 @@ function initEventListeners() {
     applyFilters();
   });
 
-  // Kliknięcie w karty statystyk (Szybkie filtry)
+  // Szybkie filtry z kart statystyk
   elements.statCards.forEach(card => {
     card.addEventListener('click', () => {
       elements.statCards.forEach(c => c.classList.remove('active'));
@@ -232,7 +235,7 @@ async function loadData() {
     applyFilters();
   } catch (err) {
     console.error('Błąd podczas ładowania danych:', err);
-    showToast('❌ Błąd połączenia z serwerem API');
+    showToast('❌ Błąd połączenia z serwerem');
   }
 }
 
@@ -246,10 +249,10 @@ function renderChannelsModal() {
     item.innerHTML = `
       <div>
         <div class="muni-name">${escapeHtml(ch.municipality)}</div>
-        <span class="muni-topic">Temat: ${escapeHtml(ch.topic)}</span>
+        <span class="muni-topic">Kanał: <code>${escapeHtml(ch.topic)}</code></span>
       </div>
-      <a href="${escapeHtml(ch.url)}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm" title="Otwórz kanał ${escapeHtml(ch.municipality)} w ntfy">
-        🔔 Subskrybuj
+      <a href="${escapeHtml(ch.url)}" target="_blank" rel="noopener" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.8rem;" title="Otwórz kanał ${escapeHtml(ch.municipality)} w ntfy">
+        Subskrybuj
       </a>
     `;
     elements.channelsGrid.appendChild(item);
@@ -266,7 +269,7 @@ function renderStats() {
 
 function populateMunicipalitySelect() {
   const select = elements.municipalitySelect;
-  select.innerHTML = '<option value="all">Wszystkie samorządy powiatu tureckiego</option>';
+  select.innerHTML = '<option value="all">Wszystkie samorządy (Miasto & Powiat)</option>';
 
   state.municipalities.forEach(m => {
     const opt = document.createElement('option');
@@ -281,15 +284,12 @@ function applyFilters() {
   const { municipality, type, timeFilter, q, sort } = state.filters;
 
   state.filteredMeetings = state.meetings.filter(m => {
-    // Filtr samorządu
     if (municipality !== 'all' && m.municipality.toLowerCase() !== municipality.toLowerCase()) {
       return false;
     }
-    // Filtr typu
     if (type !== 'all' && m.type.toLowerCase() !== type.toLowerCase()) {
       return false;
     }
-    // Filtr czasu
     const mDate = m.date.slice(0, 10);
     if (timeFilter === 'upcoming' && mDate < todayStr) {
       return false;
@@ -297,7 +297,6 @@ function applyFilters() {
     if (timeFilter === 'past' && mDate >= todayStr) {
       return false;
     }
-    // Wyszukiwarka
     if (q) {
       const fullText = `${m.title} ${m.municipality} ${m.date} ${m.type} ${m.url}`.toLowerCase();
       if (!fullText.includes(q)) return false;
@@ -305,7 +304,7 @@ function applyFilters() {
     return true;
   });
 
-  // Sortowanie (Domyślnie date_desc - od najnowszych do najstarszych)
+  // Sortowanie
   state.filteredMeetings.sort((a, b) => {
     if (sort === 'date_asc') return a.date.localeCompare(b.date);
     return b.date.localeCompare(a.date);
@@ -316,7 +315,7 @@ function applyFilters() {
 
 function renderMeetings() {
   const count = state.filteredMeetings.length;
-  elements.resultsCount.innerHTML = `Znaleziono: <strong>${count}</strong> ${getPolishPlural(count, 'posiedzenie', 'posiedzenia', 'posiedzeń')}`;
+  elements.resultsCount.innerHTML = `Liczba posiedzeń: <strong>${count}</strong>`;
 
   const isEmpty = count === 0;
   elements.emptyState.classList.toggle('hidden', !isEmpty);
@@ -337,15 +336,19 @@ function renderCardsView() {
 
   state.filteredMeetings.forEach(m => {
     const card = document.createElement('div');
-    card.className = 'meeting-card';
+    const isSesja = m.type.toLowerCase().includes('sesj');
+    const typeClass = isSesja ? 'sesja' : 'komisja';
+    const cardTypeClass = isSesja ? 'card-type-sesja' : 'card-type-komisja';
+    
+    card.className = `meeting-card ${cardTypeClass}`;
 
-    const typeClass = m.type.toLowerCase().includes('sesj') ? 'sesja' : 'komisja';
     const countdown = getCountdown(m.date);
     const googleCalUrl = createGoogleCalendarLink(m);
+    const dateBadge = parseDateComponents(m.date);
 
     card.innerHTML = `
       <div>
-        <div class="card-top">
+        <div class="card-header-row">
           <span class="municipality-tag">${escapeHtml(m.municipality)}</span>
           <span class="type-tag ${typeClass}">${escapeHtml(m.type)}</span>
         </div>
@@ -353,20 +356,29 @@ function renderCardsView() {
       </div>
 
       <div>
-        <div class="card-meta">
-          <div class="datetime-box">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            <span>${formatHumanDate(m.date)}</span>
+        <div class="card-schedule-box">
+          <div class="date-badge-widget">
+            <div class="calendar-mini-box">
+              <span class="cal-month">${dateBadge.month}</span>
+              <span class="cal-day">${dateBadge.day}</span>
+            </div>
+            <div class="date-info-texts">
+              <span class="date-full-text">${dateBadge.weekday}, ${dateBadge.year}</span>
+              <span class="date-time-text">
+                <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                ${dateBadge.time}
+              </span>
+            </div>
           </div>
           <span class="countdown-pill ${countdown.pillClass}">${countdown.label}</span>
         </div>
 
         <div class="card-actions">
-          <a href="${escapeHtml(m.url)}" target="_blank" rel="noopener" class="card-btn card-btn-link" title="Przejdź do oficjalnego źródła BIP">
+          <a href="${escapeHtml(m.url)}" target="_blank" rel="noopener" class="card-btn card-btn-link" title="Przejdź do źródła">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
             BIP / Źródło
           </a>
-          <a href="${googleCalUrl}" target="_blank" rel="noopener" class="card-btn card-btn-cal" title="Dodaj wydarzenie do Kalendarza Google">
+          <a href="${googleCalUrl}" target="_blank" rel="noopener" class="card-btn card-btn-cal" title="Dodaj do Kalendarza Google">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
             + Kalendarz
           </a>
@@ -384,21 +396,22 @@ function renderTableView() {
     const tr = document.createElement('tr');
     const typeClass = m.type.toLowerCase().includes('sesj') ? 'sesja' : 'komisja';
     const countdown = getCountdown(m.date);
+    const dateBadge = parseDateComponents(m.date);
 
     tr.innerHTML = `
       <td style="white-space: nowrap;">
-        <strong>${formatHumanDate(m.date)}</strong>
-        <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 2px;">
-          <span class="countdown-pill ${countdown.pillClass}" style="font-size: 0.7rem; padding: 1px 6px;">${countdown.label}</span>
+        <strong>${dateBadge.day} ${dateBadge.month} ${dateBadge.year}</strong>
+        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">
+          ${dateBadge.time} &bull; <span class="countdown-pill ${countdown.pillClass}" style="font-size: 0.68rem; padding: 1px 6px;">${countdown.label}</span>
         </div>
       </td>
       <td><strong>${escapeHtml(m.municipality)}</strong></td>
       <td><span class="type-tag ${typeClass}">${escapeHtml(m.type)}</span></td>
       <td>${escapeHtml(m.title)}</td>
-      <td><span style="font-size: 0.8rem; font-weight: 600; color: #4ade80;">${escapeHtml(m.status)}</span></td>
+      <td><span style="font-size: 0.8rem; font-weight: 600; color: var(--success);">${escapeHtml(m.status)}</span></td>
       <td>
-        <a href="${escapeHtml(m.url)}" target="_blank" rel="noopener" class="card-btn card-btn-link" style="padding: 4px 10px; font-size: 0.75rem;">
-          Otwórz BIP &rarr;
+        <a href="${escapeHtml(m.url)}" target="_blank" rel="noopener" class="card-btn card-btn-link" style="padding: 4px 10px; font-size: 0.75rem; display: inline-flex;">
+          BIP &rarr;
         </a>
       </td>
     `;
@@ -411,20 +424,20 @@ async function handleSync() {
   state.isSyncing = true;
   elements.btnSync.disabled = true;
   elements.syncIcon.classList.add('spin');
-  showToast('🔄 Rozpoczęto synchronizację z biuletynami BIP...');
+  showToast('🔄 Synchronizacja z biuletynami BIP w toku...');
 
   try {
     const res = await fetch('/api/sync', { method: 'POST' });
     const data = await res.json();
 
     if (data.success) {
-      showToast(`✅ Zsynchronizowano! Sprawdzono ${data.totalProcessed} pozycji (Nowe: ${data.totalNew}, Zmiany: ${data.totalUpdated})`);
+      showToast(`✅ Zsynchronizowano: sprawdzono ${data.totalProcessed} poz. (+${data.totalNew} nowych)`);
       await loadData();
     } else {
       showToast(`❌ Błąd: ${data.error || 'Nieznany błąd'}`);
     }
   } catch (err) {
-    showToast(`❌ Błąd połączenia z serwerem synchronizacji`);
+    showToast(`❌ Błąd połączenia z serwerem`);
   } finally {
     state.isSyncing = false;
     elements.btnSync.disabled = false;
@@ -440,25 +453,32 @@ function showToast(message) {
   }, 4500);
 }
 
-// Pomocnicze funkcje formatujące
-function formatHumanDate(dateStr) {
-  if (!dateStr) return 'Termin do ustalenia';
+// Rozbicie daty na czytelne komponenty kalendarzowe
+function parseDateComponents(dateStr) {
+  if (!dateStr) {
+    return { day: '?', month: '---', year: '', weekday: 'Brak terminu', time: 'Brak godziny' };
+  }
   try {
     const parts = dateStr.split(' ');
     const datePart = parts[0];
-    const timePart = parts[1] ? ` godz. ${parts[1]}` : '';
+    const timePart = parts[1] ? `godz. ${parts[1]}` : 'godzina niepodana';
 
     const d = new Date(datePart);
-    if (isNaN(d.getTime())) return dateStr;
+    if (isNaN(d.getTime())) {
+      return { day: '!', month: 'DATA', year: '', weekday: dateStr, time: '' };
+    }
 
-    const formatter = new Intl.DateTimeFormat('pl-PL', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
-    return `${formatter.format(d)}${timePart}`;
+    const months = ['STY', 'LUT', 'MAR', 'KWI', 'MAJ', 'CZE', 'LIP', 'SIE', 'WRZ', 'PAŹ', 'LIS', 'GRU'];
+    const weekdays = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'];
+
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = months[d.getMonth()];
+    const year = d.getFullYear();
+    const weekday = weekdays[d.getDay()];
+
+    return { day, month, year, weekday, time: timePart };
   } catch {
-    return dateStr;
+    return { day: '?', month: '---', year: '', weekday: dateStr, time: '' };
   }
 }
 
@@ -496,14 +516,6 @@ function createGoogleCalendarLink(m) {
   } catch {
     return 'https://calendar.google.com';
   }
-}
-
-function getPolishPlural(n, one, few, many) {
-  if (n === 1) return one;
-  const mod10 = n % 10;
-  const mod100 = n % 100;
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return few;
-  return many;
 }
 
 function escapeHtml(str) {
