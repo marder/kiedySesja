@@ -16,7 +16,19 @@ export class PowiatTurekScraper extends BaseScraper {
   public async scrape(): Promise<RawMeeting[]> {
     console.log(`[${this.name}] Pobieranie terminarza sesji z: ${this.scheduleUrl}`);
 
-    const response = await this.fetchWithTimeout(this.scheduleUrl);
+    let response = await this.fetchWithTimeout(this.scheduleUrl);
+    
+    // Jeśli serwer BIP zablokuje stronę główną kodem 403 (np. przez regułę WAF dla IP hostingu VPS),
+    // skorzystaj z oficjalnego endpointu XML BIP:
+    if (!response.ok && (response.status === 403 || response.status === 401)) {
+      console.warn(`[${this.name}] Otrzymano HTTP ${response.status} ze strony HTML, próba pobrania przez endpoint XML...`);
+      const xmlUrl = 'https://bip.powiat.turek.pl/xml/101/Terminarz_sesji/';
+      const xmlResponse = await this.fetchWithTimeout(xmlUrl);
+      if (xmlResponse.ok) {
+        response = xmlResponse;
+      }
+    }
+
     if (!response.ok) {
       throw new Error(`Błąd HTTP ${response.status} podczas pobierania terminarza Powiatu Tureckiego`);
     }
