@@ -1,4 +1,6 @@
 import { createRequire } from 'node:module';
+import fs from 'node:fs';
+import path from 'node:path';
 import { config } from '../config/index.js';
 import { Meeting } from '../types/index.js';
 
@@ -18,7 +20,13 @@ export class MeetingDatabase {
   private db: SqliteDbAdapter;
 
   constructor(dbPath: string = config.db.path) {
-    this.db = this.initEngine(dbPath);
+    const resolvedPath = path.resolve(process.cwd(), dbPath);
+    const parentDir = path.dirname(resolvedPath);
+    if (!fs.existsSync(parentDir)) {
+      fs.mkdirSync(parentDir, { recursive: true });
+    }
+
+    this.db = this.initEngine(resolvedPath);
     this.initSchema();
   }
 

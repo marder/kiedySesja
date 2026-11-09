@@ -2,7 +2,9 @@ import path from 'node:path';
 
 export const config = {
   db: {
-    path: process.env.DB_PATH || path.resolve(process.cwd(), 'meetings.db'),
+    path: process.env.DB_PATH
+      ? path.resolve(process.cwd(), process.env.DB_PATH)
+      : path.resolve(process.cwd(), 'meetings.db'),
   },
   ntfy: {
     enabled: process.env.NTFY_ENABLED !== 'false',
