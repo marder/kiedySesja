@@ -16,21 +16,28 @@ export class PowiatTurekScraper extends BaseScraper {
   public async scrape(): Promise<RawMeeting[]> {
     console.log(`[${this.name}] Pobieranie terminarza sesji z: ${this.scheduleUrl}`);
 
-    let response = await this.fetchWithTimeout(this.scheduleUrl);
-    
-    // Jeśli serwer BIP zablokuje stronę główną kodem 403 (np. przez regułę WAF dla IP hostingu VPS),
-    // skorzystaj z oficjalnego endpointu XML BIP:
-    if (!response.ok && (response.status === 403 || response.status === 401)) {
-      console.warn(`[${this.name}] Otrzymano HTTP ${response.status} ze strony HTML, próba pobrania przez endpoint XML...`);
-      const xmlUrl = 'https://bip.powiat.turek.pl/xml/101/Terminarz_sesji/';
-      const xmlResponse = await this.fetchWithTimeout(xmlUrl);
-      if (xmlResponse.ok) {
-        response = xmlResponse;
-      }
+    let response: Response;
+    try {
+      response = await this.fetchWithTimeout(this.scheduleUrl);
+    } catch (err) {
+      console.warn(`[${this.name}] Błąd sieci podczas odpytywania BIP: ${(err as Error).message}`);
+      return [];
     }
 
+    // Obsługa geoblokady BIP Starostwa Powiatowego (kod 403 z zagranicznych adresów IP np. Hetzner/Mikrus)
     if (!response.ok) {
-      throw new Error(`Błąd HTTP ${response.status} podczas pobierania terminarza Powiatu Tureckiego`);
+      if (response.status === 403) {
+        console.warn(
+          `[${this.name}] Wykryto blokadę geolokalizacyjną BIP (HTTP 403). ` +
+          `Serwer BIP odrzucił adres IP zagranicznego data-center. ` +
+          `Aby pobierać dane na żywo z tego hostingu, ustaw BIP_PROXY_URL w .env (np. proxy z polskim adresem IP). ` +
+          `Serwis kontynuuje pracę na dotychczas zgromadzonych danych.`
+        );
+        return [];
+      }
+
+      console.warn(`[${this.name}] Serwer BIP zwrócił status HTTP ${response.status}`);
+      return [];
     }
 
     const html = await response.text();
