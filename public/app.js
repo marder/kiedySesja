@@ -254,7 +254,7 @@ function renderStats() {
 
 function populateMunicipalitySelect() {
   const select = elements.municipalitySelect;
-  select.innerHTML = '<option value="all">Wszystkie samorządy (Miasto & Powiat)</option>';
+  select.innerHTML = '<option value="all">Wszystkie samorządy</option>';
 
   state.municipalities.forEach(m => {
     const opt = document.createElement('option');
@@ -300,7 +300,7 @@ function applyFilters() {
 
 function renderMeetings() {
   const count = state.filteredMeetings.length;
-  elements.resultsCount.innerHTML = `Liczba posiedzeń: <strong>${count}</strong>`;
+  elements.resultsCount.innerHTML = `Posiedzenia: <strong>${count}</strong>`;
 
   const isEmpty = count === 0;
   elements.emptyState.classList.toggle('hidden', !isEmpty);
@@ -356,7 +356,7 @@ function renderCardsView() {
               <span class="cal-day">${dateBadge.day}</span>
             </div>
             <div class="date-info-texts">
-              <span class="date-full-text">${dateBadge.weekday}, ${dateBadge.year}</span>
+              <span class="date-full-text">${dateBadge.weekday}, ${dateBadge.dayNum} ${dateBadge.monthLong} ${dateBadge.year}</span>
               <span class="date-time-text">
                 <i data-lucide="clock" class="icon-inline"></i>
                 ${dateBadge.time}
@@ -449,7 +449,7 @@ function showToast(message) {
 // Rozbicie daty na czytelne komponenty kalendarzowe
 function parseDateComponents(dateStr) {
   if (!dateStr) {
-    return { day: '?', month: '---', year: '', weekday: 'Brak terminu', time: 'Brak godziny' };
+    return { day: '?', dayNum: '', month: '---', monthLong: '', year: '', weekday: 'Brak terminu', time: 'Brak godziny' };
   }
   try {
     const parts = dateStr.split(' ');
@@ -458,20 +458,23 @@ function parseDateComponents(dateStr) {
 
     const d = new Date(datePart);
     if (isNaN(d.getTime())) {
-      return { day: '!', month: 'DATA', year: '', weekday: dateStr, time: '' };
+      return { day: '!', dayNum: '', month: 'DATA', monthLong: '', year: '', weekday: dateStr, time: '' };
     }
 
     const months = ['STY', 'LUT', 'MAR', 'KWI', 'MAJ', 'CZE', 'LIP', 'SIE', 'WRZ', 'PAŹ', 'LIS', 'GRU'];
+    const monthsLong = ['sty', 'lut', 'mar', 'kwi', 'maj', 'cze', 'lip', 'sie', 'wrz', 'paź', 'lis', 'gru'];
     const weekdays = ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'];
 
-    const day = String(d.getDate()).padStart(2, '0');
+    const dayNum = d.getDate();
+    const day = String(dayNum).padStart(2, '0');
     const month = months[d.getMonth()];
+    const monthLong = monthsLong[d.getMonth()];
     const year = d.getFullYear();
     const weekday = weekdays[d.getDay()];
 
-    return { day, month, year, weekday, time: timePart };
+    return { day, dayNum, month, monthLong, year, weekday, time: timePart };
   } catch {
-    return { day: '?', month: '---', year: '', weekday: dateStr, time: '' };
+    return { day: '?', dayNum: '', month: '---', monthLong: '', year: '', weekday: dateStr, time: '' };
   }
 }
 

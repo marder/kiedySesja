@@ -29,7 +29,7 @@
             <span class="brand-title">SesjeTurek</span>
             <span class="badge-region">Miasto & Powiat</span>
           </div>
-          <span class="brand-subtitle">Rada Miejska Turku & Rada Powiatu Tureckiego</span>
+          <span class="brand-subtitle">Miasto i Powiat Turek</span>
         </div>
       </div>
 
@@ -61,51 +61,49 @@
     </div>
   </header>
 
-  <!-- Pasek statystyk (KPI) – Horyzontalny karuzelowy scroll na mobile -->
+  <!-- Pasek statystyk (KPI) – Siatka 4 kart (2x2 na mobile, 4x1 na desktopie) -->
   <section class="stats-section">
     <div class="container">
-      <div class="stats-scroll-wrapper">
-        <div class="stats-grid">
-          <button class="stat-card active" data-filter="all" type="button">
-            <div class="stat-icon icon-blue">
-              <i data-lucide="layout-grid"></i>
-            </div>
-            <div class="stat-data">
-              <div class="stat-value" id="statTotal">-</div>
-              <div class="stat-label">Wszystkie</div>
-            </div>
-          </button>
+      <div class="stats-grid">
+        <button class="stat-card active" data-filter="all" type="button">
+          <div class="stat-icon icon-blue">
+            <i data-lucide="layout-grid"></i>
+          </div>
+          <div class="stat-data">
+            <div class="stat-value" id="statTotal">-</div>
+            <div class="stat-label">Wszystkie</div>
+          </div>
+        </button>
 
-          <button class="stat-card" data-filter="upcoming" type="button">
-            <div class="stat-icon icon-green">
-              <i data-lucide="clock"></i>
-            </div>
-            <div class="stat-data">
-              <div class="stat-value" id="statUpcoming">-</div>
-              <div class="stat-label">Nadchodzące</div>
-            </div>
-          </button>
+        <button class="stat-card" data-filter="upcoming" type="button">
+          <div class="stat-icon icon-green">
+            <i data-lucide="clock"></i>
+          </div>
+          <div class="stat-data">
+            <div class="stat-value" id="statUpcoming">-</div>
+            <div class="stat-label">Nadchodzące</div>
+          </div>
+        </button>
 
-          <button class="stat-card" data-type="Sesja" type="button">
-            <div class="stat-icon icon-purple">
-              <i data-lucide="building-2"></i>
-            </div>
-            <div class="stat-data">
-              <div class="stat-value" id="statSessions">-</div>
-              <div class="stat-label">Sesje Rady</div>
-            </div>
-          </button>
+        <button class="stat-card" data-type="Sesja" type="button">
+          <div class="stat-icon icon-purple">
+            <i data-lucide="building-2"></i>
+          </div>
+          <div class="stat-data">
+            <div class="stat-value" id="statSessions">-</div>
+            <div class="stat-label">Sesje Rady</div>
+          </div>
+        </button>
 
-          <button class="stat-card" data-type="Komisja" type="button">
-            <div class="stat-icon icon-amber">
-              <i data-lucide="users"></i>
-            </div>
-            <div class="stat-data">
-              <div class="stat-value" id="statCommissions">-</div>
-              <div class="stat-label">Komisje</div>
-            </div>
-          </button>
-        </div>
+        <button class="stat-card" data-type="Komisja" type="button">
+          <div class="stat-icon icon-amber">
+            <i data-lucide="users"></i>
+          </div>
+          <div class="stat-data">
+            <div class="stat-value" id="statCommissions">-</div>
+            <div class="stat-label">Komisje</div>
+          </div>
+        </button>
       </div>
     </div>
   </section>
@@ -113,7 +111,7 @@
   <!-- Pasek filtrów i wyszukiwarka -->
   <main class="container main-content">
     <div class="filter-panel">
-      <!-- Górny wiersz: Wyszukiwarka + Wybór Samorządu -->
+      <!-- Górny wiersz: Wyszukiwarka + Wybór Samorządu + Przełącznik widoku -->
       <div class="filter-row top-row">
         <div class="search-box">
           <i data-lucide="search" class="search-icon"></i>
@@ -121,51 +119,52 @@
           <button id="btnClearSearch" class="btn-clear hidden" aria-label="Wyczyść szukanie">&times;</button>
         </div>
 
-        <div class="select-box">
-          <i data-lucide="chevron-down" class="select-chevron"></i>
-          <select id="municipalitySelect">
-            <option value="all">Wszystkie samorządy (Miasto & Powiat)</option>
-          </select>
+        <div class="muni-view-row">
+          <div class="select-box">
+            <i data-lucide="chevron-down" class="select-chevron"></i>
+            <select id="municipalitySelect" aria-label="Wybierz samorząd">
+              <option value="all">Wszystkie samorządy</option>
+            </select>
+          </div>
+
+          <!-- Przełącznik widoku: Karty vs Tabela -->
+          <div class="view-switcher" role="group" aria-label="Format widoku">
+            <button id="btnViewCards" class="view-btn active" title="Widok kafelkowy" aria-label="Widok kart">
+              <i data-lucide="layout-grid" class="icon-view"></i>
+            </button>
+            <button id="btnViewTable" class="view-btn" title="Widok listy tabelarycznej" aria-label="Widok tabeli">
+              <i data-lucide="list" class="icon-view"></i>
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- Dolny wiersz: Chipy filtrów + przełącznik widoku (Scrollowalne na mobile) -->
+      <!-- Dolny wiersz: Filtry czasu i typu (Pełna szerokość na mobile) -->
       <div class="filter-row bottom-row">
-        <div class="pills-scroll-group">
-          <!-- Czas -->
-          <div class="segmented-control" id="timeFilterControl" role="group" aria-label="Filtr czasu">
-            <button class="seg-btn active" data-time="all">Wszystkie</button>
-            <button class="seg-btn" data-time="upcoming">Nadchodzące</button>
-            <button class="seg-btn" data-time="past">Archiwalne</button>
-          </div>
-
-          <!-- Typ -->
-          <div class="segmented-control" id="typeFilterControl" role="group" aria-label="Filtr typu">
-            <button class="seg-btn active" data-type="all">Wszystkie typy</button>
-            <button class="seg-btn" data-type="Sesja">Sesje</button>
-            <button class="seg-btn" data-type="Komisja">Komisje</button>
-          </div>
+        <!-- Czas -->
+        <div class="segmented-control" id="timeFilterControl" role="group" aria-label="Filtr czasu">
+          <button class="seg-btn active" data-time="all">Wszystkie</button>
+          <button class="seg-btn" data-time="upcoming">Nadchodzące</button>
+          <button class="seg-btn" data-time="past">Archiwalne</button>
         </div>
 
-        <!-- Przełącznik widoku: Karty vs Tabela -->
-        <div class="view-switcher" role="group" aria-label="Format widoku">
-          <button id="btnViewCards" class="view-btn active" title="Widok kafelkowy" aria-label="Widok kart">
-            <i data-lucide="layout-grid" class="icon-view"></i>
-          </button>
-          <button id="btnViewTable" class="view-btn" title="Widok listy tabelarycznej" aria-label="Widok tabeli">
-            <i data-lucide="list" class="icon-view"></i>
-          </button>
+        <!-- Typ -->
+        <div class="segmented-control" id="typeFilterControl" role="group" aria-label="Filtr typu">
+          <button class="seg-btn active" data-type="all">Wszystkie typy</button>
+          <button class="seg-btn" data-type="Sesja">Sesje</button>
+          <button class="seg-btn" data-type="Komisja">Komisje</button>
         </div>
       </div>
     </div>
 
     <!-- Pasek statusu wyników & sortowanie -->
     <div class="results-header">
-      <div class="results-count" id="resultsCount">Wczytywanie posiedzeń...</div>
+      <div class="results-count" id="resultsCount">Wczytywanie...</div>
       <div class="sort-box">
-        <label for="sortSelect">Sortowanie:</label>
+        <label for="sortSelect" class="sort-label">Sortowanie:</label>
         <div class="sort-select-wrapper">
-          <select id="sortSelect">
+          <i data-lucide="arrow-up-down" class="sort-icon"></i>
+          <select id="sortSelect" aria-label="Sortowanie posiedzeń">
             <option value="date_desc" selected>Najnowsze pierwsze</option>
             <option value="date_asc">Najstarsze / najbliższe</option>
           </select>
