@@ -290,9 +290,16 @@ const server = http.createServer(async (req, res) => {
       const ext = path.extname(finalFilePath).toLowerCase();
       const mime = MIME_TYPES[ext] || 'application/octet-stream';
       const content = await fs.promises.readFile(finalFilePath);
+
+      // Dla HTML wymuszamy brak cache'owania (aby zmiany wersji i Cloudflare zawsze pobierały świeży index.html)
+      // Dla assetów z wersją (np. style.css?v=..., app.js?v=...) pozwalamy na bezpieczne cache'owanie
+      const cacheControl = ext === '.html'
+        ? 'no-cache, no-store, must-revalidate'
+        : 'public, max-age=86400';
+
       res.writeHead(200, {
         'Content-Type': mime,
-        'Cache-Control': 'public, max-age=3600',
+        'Cache-Control': cacheControl,
       });
       res.end(content);
       return;
