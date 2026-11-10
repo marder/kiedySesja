@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict';
-import { PowiatTurekScraper } from '../scrapers/powiatTurekScraper.js';
 import { MiastoTurekScraper } from '../scrapers/miastoTurekScraper.js';
 import { Scraper } from '../types/index.js';
 
@@ -10,7 +9,6 @@ async function runLiveCanaryTests() {
   console.log('='.repeat(60));
 
   const scrapers: Scraper[] = [
-    new PowiatTurekScraper(),
     new MiastoTurekScraper(),
   ];
 

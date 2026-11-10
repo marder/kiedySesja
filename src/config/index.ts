@@ -27,7 +27,6 @@ export const config = {
     intervalMinutes: Number(process.env.SYNC_INTERVAL_MINUTES) || 30,
   },
   http: {
-    proxyUrl: process.env.BIP_PROXY_URL || process.env.HTTP_PROXY || '',
     timeoutMs: Number(process.env.HTTP_TIMEOUT_MS) || 15000,
     userAgent:
       process.env.HTTP_USER_AGENT ||

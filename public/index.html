@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>SesjeTurek – Terminarz Sesji i Komisji Miasta i Powiatu Turek</title>
-  <meta name="description" content="Nowoczesny terminarz posiedzeń Rady Miejskiej Turku i Rady Powiatu Tureckiego. Sprawdzaj terminy sesji i komisji, dodawaj do kalendarza oraz otrzymuj powiadomienia PUSH.">
+  <title>SesjeTurek – Terminarz Sesji i Komisji Rady Miejskiej Turku</title>
+  <meta name="description" content="Nowoczesny terminarz posiedzeń Rady Miejskiej Turku. Sprawdzaj terminy sesji i komisji, dodawaj do kalendarza oraz otrzymuj powiadomienia PUSH.">
   <meta name="theme-color" content="#0a0d14">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,7 +14,7 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   
-  <link rel="stylesheet" href="/style.css?v=1.1.0">
+  <link rel="stylesheet" href="/style.css?v=1.2.0">
 </head>
 <body>
   <!-- Górny pasek nawigacyjny (Glassmorphism & Mobile-Optimized) -->
@@ -27,9 +27,9 @@
         <div class="brand-text">
           <div class="brand-title-row">
             <span class="brand-title">SesjeTurek</span>
-            <span class="badge-region">Miasto & Powiat</span>
+            <span class="badge-region">Rada Miejska</span>
           </div>
-          <span class="brand-subtitle">Miasto i Powiat Turek</span>
+          <span class="brand-subtitle">Rada Miejska Turku</span>
         </div>
       </div>
 
@@ -111,7 +111,7 @@
   <!-- Pasek filtrów i wyszukiwarka -->
   <main class="container main-content">
     <div class="filter-panel">
-      <!-- Górny wiersz: Wyszukiwarka + Wybór Samorządu + Przełącznik widoku -->
+      <!-- Górny wiersz: Wyszukiwarka + Przełącznik widoku -->
       <div class="filter-row top-row">
         <div class="search-box">
           <i data-lucide="search" class="search-icon"></i>
@@ -119,23 +119,14 @@
           <button id="btnClearSearch" class="btn-clear hidden" aria-label="Wyczyść szukanie">&times;</button>
         </div>
 
-        <div class="muni-view-row">
-          <div class="select-box">
-            <i data-lucide="chevron-down" class="select-chevron"></i>
-            <select id="municipalitySelect" aria-label="Wybierz samorząd">
-              <option value="all">Wszystkie samorządy</option>
-            </select>
-          </div>
-
-          <!-- Przełącznik widoku: Karty vs Tabela -->
-          <div class="view-switcher" role="group" aria-label="Format widoku">
-            <button id="btnViewCards" class="view-btn active" title="Widok kafelkowy" aria-label="Widok kart">
-              <i data-lucide="layout-grid" class="icon-view"></i>
-            </button>
-            <button id="btnViewTable" class="view-btn" title="Widok listy tabelarycznej" aria-label="Widok tabeli">
-              <i data-lucide="list" class="icon-view"></i>
-            </button>
-          </div>
+        <!-- Przełącznik widoku: Karty vs Tabela -->
+        <div class="view-switcher" role="group" aria-label="Format widoku">
+          <button id="btnViewCards" class="view-btn active" title="Widok kafelkowy" aria-label="Widok kart">
+            <i data-lucide="layout-grid" class="icon-view"></i>
+          </button>
+          <button id="btnViewTable" class="view-btn" title="Widok listy tabelarycznej" aria-label="Widok tabeli">
+            <i data-lucide="list" class="icon-view"></i>
+          </button>
         </div>
       </div>
 
@@ -218,8 +209,8 @@
         <div class="channel-card channel-featured">
           <div class="channel-info">
             <span class="channel-badge">Główny kanał oficjalny</span>
-            <h4>KiedySesja Turek (Miasto & Powiat)</h4>
-            <p>Otrzymuj alerty o każdej nowej sesji oraz posiedzeniu komisji w Turku i powiecie.</p>
+            <h4>KiedySesja Turek (Rada Miejska)</h4>
+            <p>Otrzymuj alerty o każdej nowej sesji oraz posiedzeniu komisji Rady Miejskiej Turku.</p>
             <div class="topic-tag">Kanał: <code>kiedy-sesje-turek</code></div>
           </div>
           <a href="https://ntfy.sh/kiedy-sesje-turek" target="_blank" rel="noopener" class="btn btn-primary btn-channel-cta">
@@ -253,8 +244,8 @@
   <footer class="site-footer">
     <div class="container footer-content">
       <div class="footer-left">
-        <p class="footer-brand"><strong>SesjeTurek</strong> &copy; 2026. Publiczny agregator terminarzy samorządowych.</p>
-        <p class="sources-list">Dane pobierane automatycznie z: Urząd Miejski w Turku (System Rada), Starostwo Powiatowe w Turku (BIP).</p>
+        <p class="footer-brand"><strong>SesjeTurek</strong> &copy; 2026. Publiczny agregator posiedzeń Rady Miejskiej Turku.</p>
+        <p class="sources-list">Oficjalne źródło: Urząd Miejski w Turku (System Rada).</p>
       </div>
       <div class="footer-right">
         <span class="badge-status">
@@ -264,6 +255,6 @@
     </div>
   </footer>
 
-  <script src="/app.js?v=1.1.0"></script>
+  <script src="/app.js?v=1.2.0"></script>
 </body>
 </html>

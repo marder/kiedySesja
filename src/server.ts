@@ -92,10 +92,10 @@ function generateIcs(meetings: Meeting[]): string {
   const lines = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//KiedySesja//Terminarz Powiatu Tureckiego//PL',
+    'PRODID:-//KiedySesja//Terminarz Rady Miejskiej Turku//PL',
     'CALSCALE:GREGORIAN',
     'METHOD:PUBLISH',
-    'X-WR-CALNAME:Sesje i Komisje Powiatu Tureckiego',
+    'X-WR-CALNAME:Sesje i Komisje Rady Miejskiej Turku',
     'X-WR-TIMEZONE:Europe/Warsaw',
   ];
 
@@ -105,7 +105,7 @@ function generateIcs(meetings: Meeting[]): string {
     const dtStart = cleanDate.length >= 12 ? `${cleanDate}00` : `${cleanDate.slice(0, 8)}T090000`;
 
     lines.push('BEGIN:VEVENT');
-    lines.push(`UID:${m.id}@kiedysesja.powiat.turek`);
+    lines.push(`UID:${m.id}@kiedysesja.miastoturek.pl`);
     lines.push(`DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').slice(0, 15)}Z`);
     lines.push(`DTSTART:${dtStart}`);
     lines.push(`SUMMARY:[${m.municipality}] ${m.title}`);
@@ -217,7 +217,7 @@ const server = http.createServer(async (req, res) => {
     const icsContent = generateIcs(filtered);
     res.writeHead(200, {
       'Content-Type': 'text/calendar; charset=utf-8',
-      'Content-Disposition': 'attachment; filename="sesje_powiat_turek.ics"',
+      'Content-Disposition': 'attachment; filename="sesje_rada_miejska_turek.ics"',
       'Access-Control-Allow-Origin': '*',
     });
     res.end(icsContent);
@@ -230,7 +230,7 @@ const server = http.createServer(async (req, res) => {
     const filtered = parseMeetings(all, urlObj);
     res.writeHead(200, {
       'Content-Type': 'application/json; charset=utf-8',
-      'Content-Disposition': 'attachment; filename="sesje_powiat_turek.json"',
+      'Content-Disposition': 'attachment; filename="sesje_rada_miejska_turek.json"',
       'Access-Control-Allow-Origin': '*',
     });
     res.end(JSON.stringify(filtered, null, 2));

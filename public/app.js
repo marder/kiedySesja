@@ -107,11 +107,13 @@ function initEventListeners() {
     applyFilters();
   });
 
-  // Wybór gminy
-  elements.municipalitySelect.addEventListener('change', (e) => {
-    state.filters.municipality = e.target.value;
-    applyFilters();
-  });
+  // Wybór gminy (opcjonalny, jeśli obecny w DOM)
+  if (elements.municipalitySelect) {
+    elements.municipalitySelect.addEventListener('change', (e) => {
+      state.filters.municipality = e.target.value;
+      applyFilters();
+    });
+  }
 
   // Filtr czasu
   elements.timeFilterControl.addEventListener('click', (e) => {
@@ -175,7 +177,7 @@ function initEventListeners() {
     state.filters.q = '';
     elements.searchInput.value = '';
     elements.btnClearSearch.classList.add('hidden');
-    elements.municipalitySelect.value = 'all';
+    if (elements.municipalitySelect) elements.municipalitySelect.value = 'all';
     elements.sortSelect.value = 'date_desc';
     elements.timeFilterControl.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.time === 'all'));
     elements.typeFilterControl.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('active', b.dataset.type === 'all'));
@@ -254,7 +256,8 @@ function renderStats() {
 
 function populateMunicipalitySelect() {
   const select = elements.municipalitySelect;
-  select.innerHTML = '<option value="all">Wszystkie samorządy</option>';
+  if (!select) return;
+  select.innerHTML = '<option value="all">Wszystkie</option>';
 
   state.municipalities.forEach(m => {
     const opt = document.createElement('option');

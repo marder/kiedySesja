@@ -1,5 +1,5 @@
 /**
- * Definicje kanałów powiadomień ntfy.sh dla Miasta Turek oraz Rady Powiatu Tureckiego
+ * Definicje kanałów powiadomień ntfy.sh dla Rady Miejskiej Turku
  */
 
 export interface MunicipalityTopicInfo {
@@ -13,14 +13,12 @@ export const BASE_NTFY_SERVER = 'https://ntfy.sh';
 export const GLOBAL_TOPIC = 'kiedy-sesje-turek';
 
 export const MUNICIPALITY_TOPIC_MAP: Record<string, string> = {
-  'rada powiatu tureckiego': 'kiedy-sesje-turek',
-  'starostwo powiatowe w turku': 'kiedy-sesje-turek',
   'rada miejska turku': 'kiedy-sesje-turek',
   'miasto turek': 'kiedy-sesje-turek',
 };
 
 /**
- * Zwraca nazwę dedykowanego tematu ntfy dla danej jednostki (Miasto / Powiat)
+ * Zwraca nazwę tematu ntfy
  */
 export function getMunicipalityTopic(municipalityName: string): string {
   const normalized = municipalityName.toLowerCase().trim();
@@ -31,7 +29,7 @@ export function getMunicipalityTopic(municipalityName: string): string {
 }
 
 /**
- * Zwraca listę dostępnych kanałów dla Miasta Turek i Powiatu Tureckiego
+ * Zwraca listę dostępnych kanałów
  */
 export function getAllChannels(): { global: MunicipalityTopicInfo; municipalities: MunicipalityTopicInfo[] } {
   const municipalities: MunicipalityTopicInfo[] = [
@@ -41,20 +39,14 @@ export function getAllChannels(): { global: MunicipalityTopicInfo; municipalitie
       url: `${BASE_NTFY_SERVER}/kiedy-sesje-turek`,
       description: 'Sesje Rady Miejskiej i posiedzenia komisji Miasta Turek',
     },
-    {
-      municipality: 'Rada Powiatu Tureckiego',
-      topic: 'kiedy-sesje-turek',
-      url: `${BASE_NTFY_SERVER}/kiedy-sesje-turek`,
-      description: 'Sesje i posiedzenia komisji Starostwa Powiatowego w Turku',
-    },
   ];
 
   return {
     global: {
-      municipality: 'Miasto i Powiat Turek',
+      municipality: 'Rada Miejska Turku',
       topic: GLOBAL_TOPIC,
       url: `${BASE_NTFY_SERVER}/${GLOBAL_TOPIC}`,
-      description: 'Główny kanał powiadomień dla Rady Miejskiej oraz Rady Powiatu Tureckiego',
+      description: 'Kanał powiadomień o posiedzeniach i komisjach Rady Miejskiej Turku',
     },
     municipalities,
   };

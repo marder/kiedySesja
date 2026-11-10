@@ -2,27 +2,25 @@ import { MeetingDatabase } from './db/database.js';
 import { NotificationService } from './services/notificationService.js';
 import { MeetingService } from './services/meetingService.js';
 import { Scraper } from './types/index.js';
-import { PowiatTurekScraper } from './scrapers/powiatTurekScraper.js';
 import { MiastoTurekScraper } from './scrapers/miastoTurekScraper.js';
 
 export async function runSync(db?: MeetingDatabase) {
   console.log('='.repeat(60));
-  console.log('Rozpoczcie cyklu synchronizacji terminarzy samorzadowych (Turek i Powiat)');
+  console.log('Rozpoczęcie cyklu synchronizacji terminarza Rady Miejskiej Turku');
   console.log(`Czas startu: ${new Date().toLocaleString('pl-PL')}`);
   console.log('='.repeat(60));
 
-  // Inicjalizacja komponentw
+  // Inicjalizacja komponentów
   const ownDb = db || new MeetingDatabase();
   const notificationService = new NotificationService();
   const meetingService = new MeetingService(ownDb, notificationService);
 
-  // Lista zarejestrowanych scraperw - tylko Miasto Turek i Powiat Turecki
+  // Lista zarejestrowanych scraperów - Rada Miejska Turku
   const scrapers: Scraper[] = [
-    new PowiatTurekScraper(),
     new MiastoTurekScraper(),
   ];
 
-  console.log(`[Worker] Zaladowano ${scrapers.length} scrapery: Rada Miejska Turku oraz Rada Powiatu Tureckiego.`);
+  console.log(`[Worker] Załadowano scraper: Rada Miejska Turku (System Rada).`);
 
   // Uruchomienie scraperw z izolacj bldw przez Promise.allSettled
   const results = await Promise.allSettled(
